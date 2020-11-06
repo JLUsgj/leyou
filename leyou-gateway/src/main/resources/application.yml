@@ -1,0 +1,65 @@
+server:
+  port: 10010
+
+spring:
+  application:
+    name: leyou-gateway
+  cloud:
+    refresh:
+      extra-refreshable: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10086/eureka
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+
+zuul:
+  host:
+    socket-timeout-millis: 50000
+    connect-timeout-millis: 50000
+    max-total-connections: 50000
+    max-per-route-connections: 50000
+  prefix: /api # 添加路由前缀
+  semaphore:
+    max-semaphores: 200
+  routes:
+    item-service: /item/**  #路由到商品的微服务
+    search-service: /search/**  #路由到搜索微服务
+    user-service: /user/**   #路由到用户微服务
+    auth-service: /auth/**   #路由到授权中心微服务
+    cart-service: /cart/**   #路由到购物车微服务
+    order-service: /order/**   #路由到订单微服务
+  #文件上传不经过网关，不造成不必要的网络负担
+  ignored-services:
+    - upload-service # 忽略upload-service服务
+  # 转发时携带请求本身的头信息（目的时为了将cookie内容返回到对应的请求浏览器），请求头里面带有域名
+  add-host-header: true
+  #网关默认会将请求头和响应头中的敏感头信息都过滤掉，这里设置为null则请求头就不会被过滤掉
+  sensitive-headers:  #配置禁止使用头信息，这里设置为null,否则set-cookie无效
+
+ribbon:
+  ConnectTimeout: 50000 # 连接超时时间(ms)
+  ReadTimeout: 50000 # 通信超时时间(ms)
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 50000 # 熔断超时时长：10000ms
+leyou:
+  jwt:
+    pubKeyPath:  C:\\tmp\\rsa\\rsa.pub # 公钥地址
+    cookieName: LY_TOKEN # cookie的名称
+  filter:
+    allowPaths:
+      - /api/auth
+      - /api/search
+      - /api/user/register
+      - /api/user/check
+      - /api/user/code
+      - /api/item
