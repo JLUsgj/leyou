@@ -32,7 +32,7 @@ public class BrandService {
 
         //如果查询关键字不为空,则创建模糊查询条件
         if(StringUtils.isNotBlank(key)){
-            example.createCriteria().andLike("name","%" + key + "%").
+            example.createCriteria().andLike("name","%" + key + "%" ).
                     orEqualTo("letter",key);
         }
         //排序
